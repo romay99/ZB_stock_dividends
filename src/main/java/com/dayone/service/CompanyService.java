@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CompanyService {
     private final CompanyRepository companyRepository;
     private final Trie trie;
@@ -38,7 +38,7 @@ public class CompanyService {
     }
 
     public Page<CompanyEntity> getAllCompany(Pageable pageable) {
-        throw new NotYetImplementedException();
+        return companyRepository.findAll(pageable);
     }
 
     private Company storeCompanyAndDividend(String ticker) {

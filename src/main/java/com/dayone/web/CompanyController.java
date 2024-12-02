@@ -5,6 +5,7 @@ import com.dayone.model.constants.CacheKey;
 import com.dayone.persist.entity.CompanyEntity;
 import com.dayone.service.CompanyService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/company")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CompanyController {
 
     private final CompanyService companyService;
