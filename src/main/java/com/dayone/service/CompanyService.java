@@ -10,6 +10,8 @@ import com.dayone.persist.entity.CompanyEntity;
 import com.dayone.persist.entity.DividendEntity;
 import com.dayone.scraper.Scraper;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.Trie;
 import org.apache.commons.collections4.trie.PatriciaTrie;
@@ -28,7 +30,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class CompanyService {
-
+    private final CompanyRepository companyRepository;
     private final Trie trie;
 
     public Company save(String ticker) {
@@ -50,7 +52,10 @@ public class CompanyService {
     }
 
     public List<String> getCompanyNamesByKeyword(String keyword) {
-        throw new NotYetImplementedException();
+        Pageable limit = PageRequest.of(0, 10);
+        List<String> list = companyRepository.findByNameStartingWithIgnoreCase(keyword, limit).stream(
+                ).map(a -> a.getName()).collect(Collectors.toList());
+        return list;
     }
 
     public void addAutocompleteKeyword(String keyword) {
