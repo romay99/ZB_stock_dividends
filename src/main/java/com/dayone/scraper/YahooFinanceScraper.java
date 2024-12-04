@@ -78,10 +78,11 @@ public class YahooFinanceScraper implements Scraper {
 
     @Override
     public Company scrapCompanyByTicker(String ticker) {
-        String url = String.format(SUMMARY_URL, ticker, ticker);
+        String url = String.format(SUMMARY_URL, ticker,ticker);
 
         try {
             Document document = Jsoup.connect(url).get();
+
             Element titleEle = document.getElementsByTag("h1").get(0);
             String title = titleEle.text().split(" - ")[1].trim();
 

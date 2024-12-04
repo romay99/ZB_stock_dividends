@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -42,9 +43,18 @@ public class TokenProvider {
         //      - 생성 시간
         //      - 만료 시간
         //      - signature
+        Claims claims = Jwts.claims().setSubject(username);
+        claims.put(KEY_ROLES, roles);
+        Date now = new Date();
 
         // jwt 발급
-        throw new NotYetImplementedException();
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + TOKEN_EXPIRE_TIME))
+                .signWith(SignatureAlgorithm.HS512, this.secretKey)
+                .compact();
+
     }
 
     public Authentication getAuthentication(String jwt) {

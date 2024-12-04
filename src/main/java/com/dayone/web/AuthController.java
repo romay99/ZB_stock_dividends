@@ -35,5 +35,4 @@ public class AuthController {
         log.info("user login -> " + request.getUsername());
         return ResponseEntity.ok(token);
     }
-
 }

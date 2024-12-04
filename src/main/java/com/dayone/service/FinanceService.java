@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@AllArgsConstructor
 @RequiredArgsConstructor
 public class FinanceService {
     private final CompanyRepository companyRepository;
