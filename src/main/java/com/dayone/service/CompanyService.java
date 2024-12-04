@@ -91,6 +91,7 @@ public class CompanyService {
     }
 
     public String deleteCompany(String ticker) {
+        log.info("회사 삭제: {}", ticker);
         // 1. 배당금 정보 삭제
         CompanyEntity companyEntity = companyRepository.findByTicker(ticker).orElseThrow(
                 () -> new NoCompanyException()
