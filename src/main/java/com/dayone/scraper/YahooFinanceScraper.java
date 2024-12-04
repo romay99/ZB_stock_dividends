@@ -12,6 +12,7 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +59,10 @@ public class YahooFinanceScraper implements Scraper {
                     throw new RuntimeException("Unexpected Month enum value -> " + splits[0]);
                 }
 
-                Dividend d = null;  // not implemented yet
+                Dividend d = Dividend.builder()
+                        .date(LocalDateTime.of(year, month, day,0,0))
+                        .dividend(dividend)
+                        .build();
                 dividends.add(d);
 
             }

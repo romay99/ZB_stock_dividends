@@ -3,8 +3,7 @@ package com.dayone.exception.impl;
 import com.dayone.exception.AbstractException;
 import org.springframework.http.HttpStatus;
 
-public class NoCompanyException extends AbstractException {
-
+public class AlreadyExistCompanyException extends AbstractException {
     @Override
     public int getStatusCode() {
         return HttpStatus.BAD_REQUEST.value();
@@ -12,6 +11,6 @@ public class NoCompanyException extends AbstractException {
 
     @Override
     public String getMessage() {
-        return "존재하지 않는 회사 입니다.";
+        return "이미 존재하는 회사입니다.";
     }
 }

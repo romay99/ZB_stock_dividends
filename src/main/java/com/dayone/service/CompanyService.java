@@ -1,5 +1,6 @@
 package com.dayone.service;
 
+import com.dayone.exception.impl.AlreadyExistCompanyException;
 import com.dayone.exception.impl.NoCompanyException;
 import com.dayone.model.Company;
 import com.dayone.model.ScrapedResult;
@@ -9,6 +10,7 @@ import com.dayone.persist.DividendRepository;
 import com.dayone.persist.entity.CompanyEntity;
 import com.dayone.persist.entity.DividendEntity;
 import com.dayone.scraper.Scraper;
+import com.dayone.scraper.YahooFinanceScraper;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -32,9 +35,14 @@ import java.util.stream.Collectors;
 public class CompanyService {
     private final CompanyRepository companyRepository;
     private final Trie trie;
+    private final Scraper scraper;
+    private final DividendRepository dividendRepository;
 
     public Company save(String ticker) {
-        throw new NotYetImplementedException();
+        if (companyRepository.existsByTicker(ticker)) {
+            throw new AlreadyExistCompanyException();
+        }
+        return storeCompanyAndDividend(ticker);
     }
 
     public Page<CompanyEntity> getAllCompany(Pageable pageable) {
@@ -43,12 +51,22 @@ public class CompanyService {
 
     private Company storeCompanyAndDividend(String ticker) {
         // 1. ticker 를 기준으로 회사를 스크래핑
+        Company company = scraper.scrapCompanyByTicker(ticker);
 
         // 2. 해당 회사가 존재할 경우, 회사의 배당금 정보를 스크래핑
+        if (ObjectUtils.isEmpty(company)) {
+            throw new NoCompanyException();
+        }
+        ScrapedResult scrap = scraper.scrap(company);
 
         // 3. 스크래핑 결과 반환
+        CompanyEntity savedEntity = this.companyRepository.save(new CompanyEntity(company));
+        List<DividendEntity> dividendEntities = scrap.getDividends().stream().map(
+                e -> new DividendEntity(savedEntity.getId(), e)
+        ).toList();
+        dividendRepository.saveAll(dividendEntities);
 
-        throw new NotYetImplementedException();
+        return company;
     }
 
     public List<String> getCompanyNamesByKeyword(String keyword) {
@@ -74,8 +92,14 @@ public class CompanyService {
 
     public String deleteCompany(String ticker) {
         // 1. 배당금 정보 삭제
-        // 2. 회사 정보 삭제
-        throw new NotYetImplementedException();
-    }
+        CompanyEntity companyEntity = companyRepository.findByTicker(ticker).orElseThrow(
+                () -> new NoCompanyException()
+        );
+        dividendRepository.deleteAllByCompanyId(companyEntity.getId());
 
+        // 2. 회사 정보 삭제
+        companyRepository.deleteById(companyEntity.getId());
+
+        return companyEntity.getName();
+    }
 }
